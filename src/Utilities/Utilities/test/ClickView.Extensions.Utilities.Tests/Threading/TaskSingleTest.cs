@@ -5,9 +5,17 @@
     using System.Threading.Tasks;
     using Utilities.Threading;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class TaskSingleTest
     {
+        private readonly ITestOutputHelper _outputHelper;
+
+        public TaskSingleTest(ITestOutputHelper outputHelper)
+        {
+            _outputHelper = outputHelper;
+        }
+
         [Fact]
         public async Task RunAsync_SameKey_MultipleCalls_RunOnce()
         {
@@ -76,8 +84,13 @@
                 return key;
             }
 
+            _outputHelper.WriteLine("Starting task 1...");
             await instance.RunAsync("test", (s, token) => ThingToRunAsync(s), CancellationToken.None);
+            _outputHelper.WriteLine("Task 1 finished!");
+
+            _outputHelper.WriteLine("Starting task 2...");
             await instance.RunAsync("test", (s, token) => ThingToRunAsync(s), CancellationToken.None);
+            _outputHelper.WriteLine("Task 2 finished!");
 
             Assert.Equal(2, timesRun);
         }
